@@ -141,16 +141,16 @@ stay_funil_filtros <- jus_funnel(
 stay_funil_filtros
 jus
 
-
+# para baixar os julgados e metadados, você precisa de uma conta de OAB  no site do tjsp para usar a função autenticar. Não vou colocar a minha aqui, certo?
 
 #Baixando Julgados
-autenticar(login = "11588710661", password = "SALVADOR194560")
+autenticar(login = "###########", password = "##########")
  tjsp::tjsp_baixar_acordaos_cjsg(stay_sem_creditos$cdacordao, diretorio = "stay_period/julgados_stay")
 stay_julgados<- tjsp_ler_acordaos_cjsg(diretorio = "stay_period/julgados_stay")
 
 
 #Baixando Metadados
-autenticar(login = "11588710661", password = "SALVADOR194560")
+autenticar(login = "############", password = "###########")
 baixar_cposg(processos = stay_sem_creditos$processo, diretorio = "stay_period/metadados_stay")
 
 #Analisando Metadados
