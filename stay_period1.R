@@ -23,6 +23,9 @@ stay_prorrogacao <- stay_dados %>%
 stay_assuntos <- stay_prorrogacao %>%
   mutate(ementa= remover_acentos(stay_prorrogacao$ementa))
 
+
+# Divid a ementa de acordo com as três primeiras frases. Isso possibilitou regex mais simples
+#para pegar somente trechos iniciais da ementa e ajudar na hora de fazer os filtros. Mas Não ficou muito bonito no código.
 stay_assuntos_dividido <- stay_assuntos %>%
   mutate(ementa=  str_replace(ementa, pattern = "[^[:alnum:], ]", replacement = "-"))%>%
            separate(col= ementa, into = c("primeiro", "segundo"), sep= "[-]", extra = "merge")%>%
@@ -108,7 +111,9 @@ stay_exclusao_credito2 <- stay_sem_homolog%>%
   #pull("processo")
 
 stay_sem_creditos <- filter(stay_sem_homolog,!processo %in%
-  c(stay_exclusao_exec, stay_exclusao_exec2, stay_exclusao_falencia, stay_exclusao_falencia2,stay_exclusao_penhora,stay_exclusao_fiduci, stay_exclusao_arrend, stay_exclusao_habilit, stay_exclusao_credito, stay_exclusao_credito2))
+  c(stay_exclusao_exec, stay_exclusao_exec2, stay_exclusao_falencia,
+    stay_exclusao_falencia2,stay_exclusao_penhora,stay_exclusao_fiduci,
+    stay_exclusao_arrend, stay_exclusao_habilit, stay_exclusao_credito, stay_exclusao_credito2))
 
 #Filtro de Prazo - não deu certo
 
@@ -125,10 +130,10 @@ stay_sem_creditos <- filter(stay_sem_homolog,!processo %in%
              #TRUE ~ "outros"
            #))
 
-#Filtros Utilizados
+# Grafico de Filtros Utilizados
 
 
-stay_funil_filtros <- jus_funnel(
+jus_funnel(
   stages = c("Consulta ao 2º Grau\n TJSP sobre\n 'prorrogação e stay'",
              "Restringe a julgados com \n prorrogação na ementa",
              "Remove agravos internos",
@@ -138,8 +143,6 @@ stay_funil_filtros <- jus_funnel(
   removals= c(402,4,50,17),
   title= "Filtros Aplicados para Limitação à Prorrogação do Stay Period" )
 
-stay_funil_filtros
-jus
 
 # para baixar os julgados e metadados, você precisa de uma conta de OAB  no site do tjsp para usar a função autenticar. Não vou colocar a minha aqui, certo?
 
@@ -156,6 +159,7 @@ baixar_cposg(processos = stay_sem_creditos$processo, diretorio = "stay_period/me
 #Analisando Metadados
 stay_metadados <- ler_dados_cposg(diretorio = "stay_period/metadados_stay")
 stay_partes <- ler_partes(diretorio = "stay_period/metadados_stay" )
+#filtrando para agravnates
 stay_agrav <- stay_partes %>%
   filter(str_detect(parte, "(?i)agrav")) 
 
@@ -178,8 +182,11 @@ stay_dispositivo_corrig<- stay_dispositivo %>%
     str_detect(stay_dispositivo_corrig$dispositivo, "confirmada") ~ "provido",
   ))
                      
-                     stay_sem_homolog,!processo %in%
-                                c(stay_exclusao_exec, stay_exclusao_exec2, stay_exclusao_falencia, stay_exclusao_falencia2,stay_exclusao_penhora,stay_exclusao_fiduci, stay_exclusao_arrend, stay_exclusao_habilit, stay_exclusao_credito, stay_exclusao_credito2))
+        stay_sem_homolog,!processo %in%
+                 c(stay_exclusao_exec, stay_exclusao_exec2,
+                   stay_exclusao_falencia, stay_exclusao_falencia2,stay_exclusao_penhora,
+                   stay_exclusao_fiduci, stay_exclusao_arrend, stay_exclusao_habilit, 
+                   stay_exclusao_credito, stay_exclusao_credito2))
 
 
 table(stay_dispositivo$decisão)
